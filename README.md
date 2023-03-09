@@ -4,8 +4,22 @@ Get system info into a nice convinient string of information, without using rege
 
 ### Goal 
 
-This is written to get accurate information on system status and use it along with dwm status bar. Apart from that, one can get information directly from the CLI. 
+rhis is written to get accurate information on system status and use it along with dwm status bar. Apart from that, one can get information directly from the CLI (and that's the safest way). 
 
 ### Limitations
 
 This is just the beginning of the project, at present it only does two things but if I see things that I don't get easily with things like dwmstatus or other programs that modify the dwm status bar, I will keep adding it. Since functions make use of buffer and pointers to filter information, and it is done on the stack it has some bugs here and there, so not totally safe to use yet. 
+### Compilation and Installation
+```bash
+./compile install
+```
+or if you want to enable optimizations (does weird things, not recommanded from me), do 
+```bash
+CMP_OPTMZ=<level> ./compile install
+```
+### Tests 
+The tests check if the int associated with battery percentage is different than what the actual number is.
+
+```bash
+./test
+```
