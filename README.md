@@ -17,6 +17,11 @@ or if you want to enable optimizations (does weird things, not recommanded from 
 ```bash
 CMP_OPTMZ=<level> ./compile install
 ```
+To enable debugging logs, run the commmand with 
+```bash
+DEBUG=<1|2|3|all> ./compile 
+```
+
 ### Tests 
 The tests check if the int associated with battery percentage is different than what the actual number is.
 

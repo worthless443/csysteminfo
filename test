@@ -1,3 +1,3 @@
 #!/bin/bash
-t=0;gi=0;i=0;while true; do gi=$(($gi+1));t=$(($t+1));if [ $(./a.out | awk 'NR==2{print $3}' | grep -Po '[0-9]+' | wc -c) -gt 3 ]; \
+t=0;gi=0;i=0;while true; do gi=$(($gi+1));t=$(($t+1));if [ $(./a.out |  grep -Po '[0-9]+' | wc -c) -lt 2 ]; \
 then i=$(($i+1));echo -en "\033[1;31m ERROR \033[00m"; printf "(%d/%d)\n" $i $gi;fi; if [ $t -gt 10 ]; then t=0;sleep 1;fi;done

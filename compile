@@ -1,7 +1,31 @@
 #!/bin/bash
-if [ ! -z $CMP_OPTMZ ]
-then
-	OPTMZ=-O$CMP_OPTMZ
+[ ! -z $CMP_OPTMZ ] && OPTMZ=-O$CMP_OPTMZ
+
+[ -z $DEBUG ] && DEBUG_=0 || DEBUG_=$DEBUG
+
+[ ! $(cat /tmp/memused_debug_tmp) -eq $DEBUG_ ] && I_DEBUG=1 
+[  $(cat /tmp/memused_debug_tmp) -eq $DEBUG_ ] && I_DEBUG=-1
+
+if [ ! -z $DEBUG ] && [ $DEBUG -lt 4 ]; then \
+	DEBUG_FLG=-D__DEBUG_PRINT_$DEBUG; echo $DEBUG > /tmp/memused_debug_tmp; elif [ ! -z $DEBUG ] && [ $DEBUG -gt 3 ]; then printf "DEBUG=%d: DEBUG can only be >=1 and <=3\n" $DEBUG && exit;elif [ ! -z $DEBUG ] && \
+	[ -e "$(grep -P '[0-9]' <<< $DEBUG)" ]; then echo "invalid option(char):DEBUG='$DEBUG'\n";fi
+
+match_checksum() {
+	TMP_FILE=/tmp/memused_tmp_cache_checksum
+	[ -e "$(cat $TMP_FILE-1 2>/dev/null)" ] && openssl dgst -md5-sha1 $1 > $TMP_FILE-1
+	[ -e "$(cat $TMP_FILE-2 2>/dev/null)" ] && openssl dgst -md5-sha1 $1 > $TMP_FILE-2
+	[ "$(cat $TMP_FILE-1)" == "$(openssl dgst -md5-sha1 $1)" ] && echo $1
+	[ "$(cat $TMP_FILE-2)" == "$(openssl dgst -md5-sha1 $2)" ] && echo $2
+	openssl dgst -md5-sha1 $1 > $TMP_FILE-1
+	openssl dgst -md5-sha1 $2 > $TMP_FILE-2
+}
+
+if [ $I_DEBUG -eq -1 ]; then
+	[ ! -e "$(match_checksum getcommand.c batparse.c)" ] && echo "everything up to data" && exit
+elif [ $I_DEBUG -eq 1 ];then
+	echo $DEBUG_ > /tmp/memused_debug_tmp
 fi
-clang  $OPTMZ getcommand.c batparse.c -I./ -Wall # use clang not gcc (weird UB/uninitilized portions in buffer ) and no optimizations
-if [ ! -z $1 ] && [ "$1" == "install" ]; then sudo cp a.out /usr/bin/battery;elif [ ! -z $1 ] && [ "$1" != "install" ]; then echo -e "'$1' not supported yet";fi
+
+clang  $OPTMZ $DEBUG_FLG getcommand.c batparse.c -lsc -I./ -I../glib_impl -L../glib_impl -Wall  -Wl,--rpath /home/aissy/c_cpp/glib_impl
+ # use clang not gcc (weird UB/uninitilized portions in buffer ) and no optimizations
+if [ ! -z $1 ] && [ "$1" == "install" ]; then cp a.out /usr/bin/battery;elif [ ! -z $1 ] && [ "$1" != "install" ]; then echo -e "'$1' not supported yet, use 'install' instead" 1>&2;fi

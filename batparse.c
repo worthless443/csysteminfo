@@ -3,9 +3,21 @@
 #include<stdio.h>
 #include<string.h>
 #include<fcntl.h>
-struct strpostion {
-	int start,end;
-};
+
+#include<xtoi.h>
+#ifdef _USE_CONFIG_F
+#include<config.h>
+#endif
+
+#ifdef __DEBUG_PRINT_3
+#define __DEBUG_PRINT_2 // TODO find things to add for this flag
+#define __DEBUG_PRINT_1
+#endif
+
+#ifdef __DEBUG_PRINT_2
+#define __DEBUG_PRINT_1
+#endif
+
 // these two functions help with positions of the string to be parsed
 static int getNLnumber(const char *str, int stpcnd) {
 	int size = 0,d=0;
@@ -53,6 +65,9 @@ static int reachRelvBuf1(const char *str, char *buf) {
 	char pert[10];
 	char charge[10];
 	memcpy(buf,str,getNLwholeChar(str, "ing"));
+#ifdef __DEBUG_PRINT_3
+	printf("debug2: %s\n", buf);
+#endif
 	for(int i=0;i<2;++i) strcat(buf, (char*)&chr);
 	for(int i=0,ii=-1;i<strlen(buf);++i) {
 		if(*(buf+i)=='\n') times++;
@@ -70,14 +85,29 @@ static int reachRelvBuf1(const char *str, char *buf) {
 				memcpy(charge, pert + i + 1, strlen(pert + 1) - i)	;
 		}
 	memset(charge + strlen("charg") + 1, '\0', strlen(charge) - strlen("charg") + 1);
-	printf("debug: %s\n", charge + 1);
+#ifdef __DEBUG_PRINT_1
+	printf("debug1: %s\n", charge);
+#endif
 	if(strcmp(charge + 1,"charg")==0) return 1; // matching against discharge buggy with buffers and addresses
 	else return 0;
 	return -1;
 }
 
+static int getNLcount(const char *buffer) {
+	int nl_i=0;
+	for(int nl=0;nl_i<strlen(buffer);++nl_i) {
+		if(*(buffer + nl_i)=='\n') ++nl;
+		if(nl>1) break;
+	}
+	return nl_i;
+}
+static int insertNL(char *buffer) {
+	for(int i=0;i<4;++i) 
+		*(buffer + strlen(buffer)) = '\n';
+	return 1;
+}
 static int reachRelvBuf(const char *str, char *buf) {
-	int size=0,times=0;
+	int size=0,times=0,nl_i;
 	char buffer[100];
 	for(int i=0;;size++) {
 		if(*(str+size)==*"\n") times++;
@@ -85,7 +115,7 @@ static int reachRelvBuf(const char *str, char *buf) {
 			*(buf+i) = str[size];
 			i++;
 		}
-		if(*(str+size)==*"\%") break;
+		if(*(str+size)=='%') break;
 	}
 	for(int i=0,ii=0;i<strlen(buf);i++) {
 		if(buf[i]!='\n') {
@@ -93,9 +123,23 @@ static int reachRelvBuf(const char *str, char *buf) {
 			++ii;
 		}
 	}
-	for(int i=0;i<4;i++) strcat(buffer, "\n");
+#ifdef __DEBUG_PRINT_3
+	printf("debug3: %s\n", buffer);
+#endif
+	insertNL(buffer);
+	const int old_size = strlen(buffer);
+	memset(buffer + old_size + 2, '\0', 10);
+	nl_i = getNLcount(buffer);
+	memset(buffer + nl_i, '\0', strlen(buffer) - nl_i);
+	memset(buffer + strlen(buffer) - 2, '\0', 1);
+	insertNL(buffer);
+	nl_i = getNLcount(buffer);
+	memset(buffer + nl_i, '\0', strlen(buffer) - nl_i);
 	memset(buf, '\0', strlen(buf));
     memcpy(buf, buffer, strlen(buffer));
+#ifdef __DEBUG_PRINT_1
+	printf("debug1:%s", buf);
+#endif
 	return 1; // TODO enable error checking associated with ret int
 }
 static int reachRelvNum(const char *str, char *buf) {
@@ -115,7 +159,7 @@ int parse_str(const char *str, char *buf) {
 	for(int i=0;i<4;i++) strcat(buf, "\n");
 	reachRelvBuf(buf,buffer_);
 	reachRelvNum(buffer_,buffer);
-	return atoi(buffer);
+	return _atoi(buffer);
 }
 int parse_charge(const char *str, char *buf) {
 	return reachRelvBuf1(str, buf);
