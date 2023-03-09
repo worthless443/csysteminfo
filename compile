@@ -4,3 +4,4 @@ then
 	OPTMZ=-O$CMP_OPTMZ
 fi
 clang  $OPTMZ getcommand.c batparse.c -I./ -Wall # use clang not gcc (weird UB/uninitilized portions in buffer ) and no optimizations
+if [ ! -z $1 ] && [ "$1" == "install" ]; then sudo cp a.out /usr/bin/battery;elif [ ! -z $1 ] && [ "$1" != "install" ]; then echo -e "'$1' not supported yet";fi
