@@ -6,10 +6,15 @@
 #include<batparse.h>
 
 int getStdOutInput(const char *command, char *buffer) {
+	int ret = 0,i;
 	char buf[1];
 	FILE *fp = popen(command, "r");
-	while(fread(buf,1,1,fp)) strcat(buffer,buf);
-	fclose(fp);
+	while((i=fread(buf,1,1,fp))) {
+		strcat(buffer,buf);
+		ret+=i;
+	}
+	close(fp->_fileno);
+	return ret;
 }
 
 int main() {
@@ -20,7 +25,7 @@ int main() {
 	getStdOutInput(command, buffer);
 	int pert = parse_str(buffer, buf);
 	int ret = parse_charge(buffer,buf1);
-	printf("battery is %s%d\%\n", ret ? "+" : "-", pert );
+	printf("battery is %s%d\%\n", ret ? "+" : "-", pert);
 	//printf(buf1);
 	free(buffer);
 }
