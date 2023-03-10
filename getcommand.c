@@ -5,6 +5,8 @@
 
 #include<batparse.h>
 
+extern int memused_wrapper();  // nigger
+
 int getStdOutInput(const char *command, char *buffer) {
 	int ret = 0,i;
 	char buf[1];
@@ -16,7 +18,6 @@ int getStdOutInput(const char *command, char *buffer) {
 	close(fp->_fileno);
 	return ret;
 }
-
 int main() {
 	char *buffer = malloc(sizeof(char)*2000);
 	char buf[1000];
@@ -25,7 +26,7 @@ int main() {
 	getStdOutInput(command, buffer);
 	int pert = parse_str(buffer, buf);
 	int ret = parse_charge(buffer,buf1);
-	printf("battery is %s%d\%\n", ret ? "+" : "-", pert);
-	//printf(buf1);
+	printf("battery: %s%d\%\n", ret ? "+" : "-", pert);
+	printf("ramused: %dMiB\n", memused_wrapper());
 	free(buffer);
 }

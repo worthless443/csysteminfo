@@ -18,6 +18,7 @@
 #define __DEBUG_PRINT_1
 #endif
 
+
 // these two functions help with positions of the string to be parsed
 static int getNLnumber(const char *str, int stpcnd) {
 	int size = 0,d=0;
@@ -45,7 +46,11 @@ static int getNLwhole(const char *str, int ascii) {
 	return times;
 }
 
+#ifdef __DEBUG_SYMBOLS
+int getNLwholeChar(const char *str, const char *mat) {
+#else
 static int getNLwholeChar(const char *str, const char *mat) {
+#endif
 	int times=0,i;
 	for(i=0;i<strlen(str);i++)  {
 		for(int j=0;j<strlen(mat);++j) {
@@ -86,7 +91,7 @@ static int reachRelvBuf1(const char *str, char *buf) {
 		}
 	memset(charge + strlen("charg") + 1, '\0', strlen(charge) - strlen("charg") + 1);
 #ifdef __DEBUG_PRINT_1
-	printf("debug1: %s\n", charge);
+	printf("debug2: %s\n", charge);
 #endif
 	if(strcmp(charge + 1,"charg")==0) return 1; // matching against discharge buggy with buffers and addresses
 	else return 0;
@@ -138,13 +143,13 @@ static int reachRelvBuf(const char *str, char *buf) {
 	memset(buf, '\0', strlen(buf));
     memcpy(buf, buffer, strlen(buffer));
 #ifdef __DEBUG_PRINT_1
-	printf("debug1:%s", buf);
+	printf("debug69:%s", buf);
 #endif
 	return 1; // TODO enable error checking associated with ret int
 }
 static int reachRelvNum(const char *str, char *buf) {
 	for(int i=0,ii=0;i<strlen(str);i++) {
-		if(str[i] >= 48 && str[i] <= 57) {
+		if(str[i] >= '0' && str[i] <= '9') {
 			buf[ii] = str[i];
 			++ii;
 		}
@@ -154,11 +159,16 @@ static int reachRelvNum(const char *str, char *buf) {
 
 int parse_str(const char *str, char *buf) {
 	char buffer_[100];
-	char buffer[3];
+	char buffer[100];
+	memset(buffer,'\0', 100);
 	memcpy(buf,str,getNLwhole(str, *"\%")+2);
 	for(int i=0;i<4;i++) strcat(buf, "\n");
 	reachRelvBuf(buf,buffer_);
 	reachRelvNum(buffer_,buffer);
+	memset(buffer + 4, '\0', 100 - 4);
+#ifdef __DEBUG_PRINT_2
+	printf("debug4: %s\n", buffer);
+#endif
 	return _atoi(buffer);
 }
 int parse_charge(const char *str, char *buf) {

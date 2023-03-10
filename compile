@@ -13,19 +13,21 @@ if [ ! -z $DEBUG ] && [ $DEBUG -lt 4 ]; then \
 match_checksum() {
 	TMP_FILE=/tmp/memused_tmp_cache_checksum
 	[ -e "$(cat $TMP_FILE-1 2>/dev/null)" ] && openssl dgst -md5-sha1 $1 > $TMP_FILE-1
-	[ -e "$(cat $TMP_FILE-2 2>/dev/null)" ] && openssl dgst -md5-sha1 $1 > $TMP_FILE-2
+	[ -e "$(cat $TMP_FILE-2 2>/dev/null)" ] && openssl dgst -md5-sha1 $2 > $TMP_FILE-2
+	[ -e "$(cat $TMP_FILE-3 2>/dev/null)" ] && openssl dgst -md5-sha1 $3 > $TMP_FILE-3
 	[ "$(cat $TMP_FILE-1)" == "$(openssl dgst -md5-sha1 $1)" ] && echo $1
 	[ "$(cat $TMP_FILE-2)" == "$(openssl dgst -md5-sha1 $2)" ] && echo $2
+	[ "$(cat $TMP_FILE-3)" == "$(openssl dgst -md5-sha1 $3)" ] && echo $3
 	openssl dgst -md5-sha1 $1 > $TMP_FILE-1
 	openssl dgst -md5-sha1 $2 > $TMP_FILE-2
+	openssl dgst -md5-sha1 $3 > $TMP_FILE-3
 }
-
 if [ $I_DEBUG -eq -1 ]; then
-	[ ! -e "$(match_checksum getcommand.c batparse.c)" ] && echo "everything up to data" && exit
+	[ $(match_checksum getcommand.c batparse.c memused.c | wc -l) -eq 3 ] && echo "everything up to data" && exit
 elif [ $I_DEBUG -eq 1 ];then
 	echo $DEBUG_ > /tmp/memused_debug_tmp
 fi
 
-clang  $OPTMZ $DEBUG_FLG getcommand.c batparse.c -lsc -I./ -I../glib_impl -L../glib_impl -Wall  -Wl,--rpath /home/aissy/c_cpp/glib_impl
+clang  $OPTMZ $DEBUG_FLG getcommand.c batparse.c memused.c -lsc -I./ -I../glib_impl -L../glib_impl -Wall  -Wl,--rpath /home/aissy/c_cpp/glib_impl
  # use clang not gcc (weird UB/uninitilized portions in buffer ) and no optimizations
 if [ ! -z $1 ] && [ "$1" == "install" ]; then cp a.out /usr/bin/battery;elif [ ! -z $1 ] && [ "$1" != "install" ]; then echo -e "'$1' not supported yet, use 'install' instead" 1>&2;fi
