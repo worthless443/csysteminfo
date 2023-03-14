@@ -18,7 +18,40 @@ int getStdOutInput(const char *command, char *buffer) {
 	fclose(fp);
 	return ret;
 }
-int main() {
+static char *parse_arg(char *rawarg) {
+	return rawarg + 2;	
+}
+static char *parse_opt(char *rawarg) {
+	return rawarg + 1;
+}
+
+int main(int argc, char **argv) {
+	int showmem = 0, showbat=0;
+	if(argc<2) showbat = 1;
+	else {
+		for(int i=1;i<argc;++i) {
+			if(0==strcmp(parse_arg(argv[i]),"all"))	{
+				showmem = 1;
+				showbat = 1;
+			}
+			else if(0==strcmp(parse_arg(argv[i]),"bat"))	
+				showbat  = 1;
+			else if(0==strcmp(parse_arg(argv[i]),"mem"))	
+				showmem = 1;
+			else if(0==strcmp(parse_opt(argv[i]),"m"))	
+				showmem = 1;
+			else if(0==strcmp(parse_opt(argv[i]),"b"))	
+				showbat = 1;
+			else if(0==strcmp(parse_opt(argv[i]),"a")) {
+				showbat = 1;
+				showmem = 1;
+			}
+			else {
+				fprintf(stderr, "\'%s\': not recognized\n", !(*parse_arg(argv[i]) >= 'a' && *parse_arg(argv[i] )<= 'z') ? parse_opt(argv[i]) : parse_arg(argv[i]));
+				return 1;
+			}
+		}
+	}
 	char *buffer = malloc(sizeof(char)*2000);
 	char buf[1000];
 	char buf1[500];
@@ -26,7 +59,9 @@ int main() {
 	getStdOutInput(command, buffer);
 	int pert = parse_str(buffer, buf);
 	int ret = parse_charge(buffer,buf1);
-	printf("battery: %s%d\%\n", ret ? "+" : "-", pert);
-	printf("ramused: %dMiB\n", memused_wrapper());
+	if(showbat)
+		printf("battery: %s%d\%\n", ret ? "+" : "-", pert);
+	if(showmem)
+		printf("ramused: %dMiB\n", memused_wrapper());
 	free(buffer);
 }

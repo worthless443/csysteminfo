@@ -26,6 +26,7 @@ int erase_portions(char *buffer, struct Ranges range) {
 		*(buffer + range_start + i) = *(buffer + range_end + i);
 	}
 	//memset(buffer + range_end, '\0', range_end - range_start);
+	return 1; // TODO error check
 }
 
 int erase_blankNL(char *buffer) {
