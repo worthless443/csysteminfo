@@ -15,7 +15,7 @@ int getStdOutInput(const char *command, char *buffer) {
 		strcat(buffer,buf);
 		ret+=i;
 	}
-	close(fp->_fileno);
+	fclose(fp);
 	return ret;
 }
 int main() {

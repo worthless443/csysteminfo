@@ -27,11 +27,12 @@ static int memused(int *arr) {
 			}
 		regfree(&re);
 	} 
-	for(int i=0;i<2;i++) { // cope fucking cope
+	fclose(f);
+	///for(int i=0;i<2;i++) { // cope fucking cope
 	//	if((regcomp(&re1, "[0-9]", REG_EXTENDED)==0)) {
 	//		if(regexec(&re,(char*)&out[i],0,NULL,0)==0) printf("%s\n",(char*)&out[i] );
 	//	}
-	}
+	//}
 	free(out);
 	return 1; // TODO do error check 
 }
