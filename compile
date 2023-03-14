@@ -28,6 +28,6 @@ elif [ $I_DEBUG -eq 1 ];then
 	echo $DEBUG_ > /tmp/memused_debug_tmp
 fi
 
-clang  $OPTMZ $DEBUG_FLG getcommand.c batparse.c memused.c -lsc -I./ -I../glib_impl -L../glib_impl -Wall  -Wl,--rpath /home/aissy/c_cpp/glib_impl
+clang  $OPTMZ $DEBUG_FLG getcommand.c batparse.c memused.c strutils.c -lsc -I./ -I../glib_impl -L../glib_impl -Wall  -Wl,--rpath /home/aissy/c_cpp/glib_impl
  # use clang not gcc (weird UB/uninitilized portions in buffer ) and no optimizations
 if [ ! -z $1 ] && [ "$1" == "install" ]; then cp a.out /usr/bin/battery;elif [ ! -z $1 ] && [ "$1" != "install" ]; then echo -e "'$1' not supported yet, use 'install' instead" 1>&2;fi

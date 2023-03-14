@@ -12,7 +12,7 @@
 static int memused(int *arr) {
 	FILE *f = fopen("/proc/meminfo", "r");
 	char buf[1];
-	regex_t re, re1;
+	regex_t re;
 	int res;
 	int c=0;
 	char *out = malloc(sizeof(char) * 100);
@@ -25,6 +25,7 @@ static int memused(int *arr) {
 					}
 				}
 			}
+		regfree(&re);
 	} 
 	for(int i=0;i<2;i++) { // cope fucking cope
 	//	if((regcomp(&re1, "[0-9]", REG_EXTENDED)==0)) {
@@ -32,6 +33,7 @@ static int memused(int *arr) {
 	//	}
 	}
 	free(out);
+	return 1; // TODO do error check 
 }
 
 
@@ -53,7 +55,7 @@ static int test_strutils(const char *buffer, struct Ranges range) {
 	memcpy(m_buffer, buffer, strlen(buffer));
 	erase_blankNL(m_buffer);
 	erase_portions(m_buffer, range);
-	printf(m_buffer);
+	printf("%s",m_buffer);
 	free(m_buffer);
 	return 1;
 }
@@ -63,7 +65,8 @@ int memused_wrapper() {
 	char *out = malloc(sizeof(char)*1000);
 	memused(arr);
 	for(int i=8;i<15;i++) {
-		char buf[1];
+		// use two
+		char buf[2];
 		sprintf(buf,"%d", arr[i]);
 		strcat(out,buf);
 	}
@@ -72,3 +75,15 @@ int memused_wrapper() {
 	free(out);
 	return memused_i/1000;
 }
+#ifndef __MAIN__
+void unused_functions() {
+	struct Ranges range = {1,2};
+	(void)sysinfo_ram();
+	test_strutils((char*)NULL,range);
+}
+#endif
+#ifdef __MAIN__
+int main() {
+	memused_wrapper()
+}
+#endif
