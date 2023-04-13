@@ -1,6 +1,6 @@
 OBJ=batparse.o getcmd.o memused.o strutils.o
-INCLUDE=-I./ -I../glib_impl
-LCLUDE=-L./ 
+INCLUDE=-I./ -I${GIMPL_PATH}
+LCLUDE=-L./ -L${GIMPL_PATH}
 CC=gcc
 LIB=libmst.a
 MAIN=main
@@ -11,7 +11,7 @@ $(OBJ):%.o:%.c
 $(LIB):$(OBJ)
 	ar rcs $@ $^
 $(MAIN):
-	${CC}  $@.c -o $@  ${INCLUDE} ${LCLUDE} -lmst
+	${CC}  $@.c -o $@  ${INCLUDE} ${LCLUDE} -lmst -lgimpl
 cleanobj:
 	rm -rf *.o
 clean:
