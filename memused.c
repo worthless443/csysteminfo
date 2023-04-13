@@ -28,11 +28,6 @@ static int memused(int *arr) {
 		regfree(&re);
 	} 
 	fclose(f);
-	///for(int i=0;i<2;i++) { // cope fucking cope
-	//	if((regcomp(&re1, "[0-9]", REG_EXTENDED)==0)) {
-	//		if(regexec(&re,(char*)&out[i],0,NULL,0)==0) printf("%s\n",(char*)&out[i] );
-	//	}
-	//}
 	free(out);
 	return 1; // TODO do error check 
 }
@@ -51,6 +46,14 @@ static size_t sysinfo_ram() {
 // TODO write test cases for range and string
 const char *buffer = "fuck\nyou\nfucking\n\nnigger\ncoomer\n\nsoyjack\n";
 
+static char *filter_nonint(const char *str) {
+	char *out = malloc(sizeof(char)*100);
+	for(int i = 0,j=-1;i<strlen(str);++i)
+		if(*(str + i)>='0' && *(str + i) <='9')
+			out[++j] = str[i];
+	return out;
+}
+
 static int test_strutils(const char *buffer, struct Ranges range) {
 	char *m_buffer = malloc(sizeof(char)*1000);
 	memcpy(m_buffer, buffer, strlen(buffer));
@@ -61,9 +64,8 @@ static int test_strutils(const char *buffer, struct Ranges range) {
 	return 1;
 }
 int memused_wrapper() {
- 	//printf("free : %ld\n", sysinfo_ram());
 	int *arr = malloc(sizeof(int)*1000);
-	char *out = malloc(sizeof(char)*1000);
+	char *out = malloc(sizeof(char)*1000),*snum = NULL;
 	memused(arr);
 	for(int i=8;i<15;i++) {
 		// use two
@@ -71,9 +73,11 @@ int memused_wrapper() {
 		sprintf(buf,"%d", arr[i]);
 		strcat(out,buf);
 	}
-	int memused_i = atoi(out);
+	snum = filter_nonint((const char*)out);
+	int memused_i = atoi(snum);
 	free(arr);
 	free(out);
+	free(snum);
 	return memused_i/1000;
 }
 #ifndef __MAIN__

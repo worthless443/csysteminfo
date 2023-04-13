@@ -7,17 +7,7 @@
 
 extern int memused_wrapper();  // nigger
 
-int getStdOutInput(const char *command, char *buffer) {
-	int ret = 0,i;
-	char buf[1];
-	FILE *fp = popen(command, "r");
-	while((i=fread(buf,1,1,fp))) {
-		strcat(buffer,buf);
-		ret+=i;
-	}
-	fclose(fp);
-	return ret;
-}
+
 static char *parse_arg(char *rawarg) {
 	return rawarg + 2;	
 }
@@ -52,16 +42,10 @@ int main(int argc, char **argv) {
 			}
 		}
 	}
-	char *buffer = malloc(sizeof(char)*2000);
-	char buf[1000];
-	char buf1[500];
-	const char *command = "upower -i /org/freedesktop/UPower/devices/battery_BAT0";
-	getStdOutInput(command, buffer);
-	int pert = parse_str(buffer, buf);
-	int ret = parse_charge(buffer,buf1);
+	struct BatSt st;
+	bat_parse(&st);
 	if(showbat)
-		printf("battery: %s%d\%\n", ret ? "+" : "-", pert);
+		printf("battery: %s%d\%\n", st.ret ? "+" : "-", st.pert);
 	if(showmem)
 		printf("ramused: %dMiB\n", memused_wrapper());
-	free(buffer);
 }
