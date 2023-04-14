@@ -9,7 +9,14 @@ rhis is written to get accurate information on system status and use it along wi
 ### Limitations
 
 This is just the beginning of the project, at present it only does two things but if I see things that I don't get easily with things like dwmstatus or other programs that modify the dwm status bar, I will keep adding it. Since functions make use of buffer and pointers to filter information, and it is done on the stack it has some bugs here and there, so not totally safe to use yet. 
-### Compilation and Installation
+### Compilation and Installation (Legecy)
+```
+cd csysteminfo
+make
+```
+you will end up having `st` binary, that's the main binary. also a static `libmst.a`, that's the reusable library
+
+### Compilation and Installation (Legecy)
 ```bash
 ./compile install
 ```
