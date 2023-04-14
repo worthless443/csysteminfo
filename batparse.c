@@ -158,12 +158,29 @@ static int reachRelvNum(const char *str, char *buf) {
 }
 
 int parse_str(const char *str, char *buf) {
-	char buffer_[100];
+	size_t oldsize;
+	char buffer_[100],buf_[1000];
 	char buffer[100];
+	memset(buf_,'\0',1000);
 	memset(buffer,'\0', 100);
 	memcpy(buf,str,getNLwhole(str, *"\%")+2);
+	for(oldsize = 0;buf[oldsize] != '%';++oldsize);
 	for(int i=0;i<4;i++) strcat(buf, "\n");
-	reachRelvBuf(buf,buffer_);
+	memcpy(buf_,buf,++oldsize);
+	//for(int i=0;i<strlen(buf);++i) {
+	//	char test = buf[i];
+	//	if(i>oldsize) {
+	//		if(test == '\n')
+	//			printf(&test);
+	//	}
+	//	else if(i == oldsize) printf("here");
+	//	else
+	//		printf(&test);
+	//}
+ 	for(int i=oldsize,ii=oldsize-1;i<strlen(buf);++i)
+ 		if(buf[i]=='\n')
+ 			buf_[++ii] = buf[i];
+	reachRelvBuf(buf_,buffer_);
 	reachRelvNum(buffer_,buffer);
 	memset(buffer + 4, '\0', 100 - 4);
 #ifdef __DEBUG_PRINT_2
