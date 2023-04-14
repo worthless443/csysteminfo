@@ -1,18 +1,16 @@
+include config.mk
 OBJ=batparse.o getcmd.o memused.o strutils.o
-INCLUDE=-I./ -I${GIMPL_PATH}
-LCLUDE=-L./ -L${GIMPL_PATH}
-CC=gcc
 LIB=libmst.a
-MAIN=main
+MAIN=main.c
 
-all: $(LIB) $(MAIN) 
+all: $(LIB) st
 $(OBJ):%.o:%.c
 	${CC} -c $^ ${INCLUDE} -o $@
 $(LIB):$(OBJ)
 	ar rcs $@ $^
-$(MAIN):
-	${CC}  $@.c -o $@  ${INCLUDE} ${LCLUDE} -lmst -lgimpl
+st:$(MAIN)
+	${CC}  $^ -o $@  ${INCLUDE} ${LCLUDE} -lmst -lgimpl
 cleanobj:
 	rm -rf *.o
 clean:
-	rm -rf *.o *.a $(MAIN)
+	rm -rf *.o *.a st
