@@ -7,3 +7,4 @@ struct BatSt {
 	int ret,pert;
 };
 int bat_parse(struct BatSt *);
+int only_process_wrapper(int);

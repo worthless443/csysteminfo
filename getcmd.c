@@ -4,6 +4,7 @@
 #include<stdlib.h>
 
 #include<batparse.h>
+#include<proc.h>
 
 static int getStdOutInput(const char *command, char *buffer) {
 	int ret = 0,i;
@@ -25,5 +26,17 @@ int bat_parse(struct BatSt *st) {
 	st->pert = parse_str(buffer, buf);
 	st->ret = parse_charge(buffer,buf1);
 	free(buffer);
+	return 1;
+}
+
+int only_process_wrapper(int offset) {
+	char *cmd = stdout_getcmd("ps -a");
+	int nl_size = calc_newline(cmd);
+	char **lines = split_ps_buffer(cmd);
+	char **procs = get_processes(lines,nl_size);	
+	print_process(procs,nl_size,offset);
+	split_buffer_free(lines,nl_size);
+	proc_free(procs,nl_size);
+	free(cmd);
 	return 1;
 }
