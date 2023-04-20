@@ -122,13 +122,32 @@ void print_process(char **procs,int nl_size,int offset) {
 	printf(")\n");
 }
 
+char *store_process_string(char **procs,int nl_size,int offset) {
+	char *procs_str = malloc(sizeof(char)*100*3);
+	memset(procs_str,'\0',100*3);
+	strcat(procs_str, "(");
+	for(int i=offset;i<nl_size;++i) {
+		char buffer_tmp[100];
+		memset(buffer_tmp,'\0',10);
+		char *new = filter_nl(procs[i]);
+		sprintf(buffer_tmp, (i < nl_size -1) ? "%s, " : "%s", new);
+		strcat(procs_str,buffer_tmp);
+		free(new);
+	}
+	strcat(procs_str,")");
+	return procs_str;
+}
+
 #ifdef __MAIN__
 int main() {
 	char *cmd = stdout_getcmd("ps -a");
 	int nl_size = calc_newline(cmd);
 	char **lines = split_ps_buffer(cmd);
 	char **procs = get_processes(lines,nl_size);	
-	print_process(procs,nl_size);
+	//print_process(procs,nl_size);
+	char *str = store_process_string(procs,nl_size,2);
+	printf("%s\n",str);
+	free(str);
 	split_buffer_free(lines,nl_size);
 	proc_free(procs,nl_size);
 	free(cmd);

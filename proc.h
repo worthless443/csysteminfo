@@ -7,3 +7,4 @@ int calc_line_size(char *buffer,int line) ;
 int calc_newline(char *buffer) ;
 char *stdout_getcmd(const char *cmd) ;
 void print_process(char **procs,int nl_size,int) ;
+char *store_process_string(char **procs,int nl_size,int offset);
