@@ -46,9 +46,9 @@ char *only_process_wrapper_str(int offset) {
 	int nl_size = calc_newline(cmd);
 	char **lines = split_ps_buffer(cmd);
 	char **procs = get_processes(lines,nl_size);	
-	store_process_string(procs,nl_size,offset);
+	char *proc_str = store_process_string(procs,nl_size,offset);
 	split_buffer_free(lines,nl_size);
 	proc_free(procs,nl_size);
 	free(cmd);
-	return 1;
+	return proc_str;
 }
