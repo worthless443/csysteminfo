@@ -8,3 +8,4 @@ struct BatSt {
 };
 int bat_parse(struct BatSt *);
 int only_process_wrapper(int);
+char *only_process_wrapper_str(int offset);
