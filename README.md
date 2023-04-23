@@ -1,38 +1,39 @@
 ### System info parser in plain c (no regex)
 
-Get system info into a nice convinient string of information, without using regex to parse it. The parsing here is done "Manually" as the regex in libc has a lot of memory related problems. Used dynamic allocation only three times and made sure to not have a leaky memory.
+Get very essential system info into a nice convinient string of information, without using regex to parse it. The parsing here is done "Manually" as the regex in libc has a lot of memory related problems and bugs. As much as I would like to not use dynamic allocations, larger parts of the code didn't help me but got nessitise dynamic allocation, I have tried my best,however, to avoid leaks but bugs in either this program or external libraries make leaks still possible.
 
 ### Goal 
 
-rhis is written to get accurate information on system status and use it along with dwm status bar. Apart from that, one can get information directly from the CLI (and that's the safest way). 
+this is written solely as a wrapper and parser to system commands or files that hold info about the system and transforming it into easily readable format. To get accurate information on system status, many of the dark bugs needs to be avoided. At the early stages that we are as of now, this can't do a lot, it can so about do very basic things which was intended primarily for my personal usage for viewing system details easily.
 
 ### Limitations
+it can do,
+* parse battery data and show percentage and charging information
+* parse memory usage data in MiBs 
+* Show most recent processes being run
 
-This is just the beginning of the project, at present it only does two things but if I see things that I don't get easily with things like dwmstatus or other programs that modify the dwm status bar, I will keep adding it. Since functions make use of buffer and pointers to filter information, and it is done on the stack it has some bugs here and there, so not totally safe to use yet. 
-### Compilation and Installation (Legecy)
+### Compilation and Installation 
 ```
 cd csysteminfo
 make
 ```
 you will end up having `st` binary, that's the main binary. also a static `libmst.a`, that's the reusable library
 
+### Running
+```
+./st -a # show everthing
+./st -<b|m|p> --poff <number of recent processes>
+```
 ### Compilation and Installation (Legecy)
 ```bash
-./compile install
+./utils/compile install
 ```
 or if you want to enable optimizations (does weird things, not recommanded from me), do 
 ```bash
-CMP_OPTMZ=<level> ./compile install
+CMP_OPTMZ=<level> ./utils/compile install
 ```
 To enable debugging logs, run the commmand with 
 ```bash
-DEBUG=<1|2|3|all> ./compile 
-```
-
-### Tests 
-The tests check if the int associated with battery percentage is different than what the actual number is.
-
-```bash
-./test
+DEBUG=<1|2|3|all> ./utils/compile 
 ```
 
