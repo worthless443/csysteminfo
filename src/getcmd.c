@@ -9,20 +9,20 @@
 static int getStdOutInput(const char *command, char *buffer) {
 	int ret = 0,i;
 	char buf[1];
-	FILE *fp = popen(command, "r");
+	FILE *fp = popen(command, "rw");
 	while((i=fread(buf,1,1,fp))) {
 		strcat(buffer,buf);
+		printf("%s\n",buffer);
 		ret+=i;
 	}
 	fclose(fp);
 	return ret;
 }
 int bat_parse(struct BatSt *st) {
-    char *buffer = malloc(sizeof(char)*2000);
 	char buf[1000];
 	char buf1[1000];
 	const char *command = "upower -i /org/freedesktop/UPower/devices/battery_BAT0";
-	getStdOutInput(command, buffer);
+    char *buffer = stdout_getcmd(command);
 	st->pert = parse_str(buffer, buf);
 	st->ret = parse_charge(buffer,buf1);
 	free(buffer);
@@ -32,12 +32,14 @@ int bat_parse(struct BatSt *st) {
 int only_process_wrapper(int offset) {
 	char *cmd = stdout_getcmd("ps -a");
 	int nl_size = calc_newline(cmd);
+	char **procs = malloc(sizeof(char*)*nl_size + 1);
 	char **lines = split_ps_buffer(cmd);
-	char **procs = get_processes(lines,nl_size);	
+	get_processes_non_alloc(lines,procs,nl_size);	
 	print_process(procs,nl_size,offset);
 	split_buffer_free(lines,nl_size);
-	proc_free(procs,nl_size);
 	free(cmd);
+	proc_free(procs,nl_size);
+	free(procs);
 	return 1;
 }
 

@@ -6,15 +6,15 @@ INSTALL=/usr/bin/st
 
 all: $(LIB) st
 install:$(INSTALL)
-$(OBJ):%.o:%.c
-	${CC} -c $^ ${FLAGS} ${INCLUDE} -o $@
+$(OBJ):%.o:src/%.c
+	${CC} -c $^ ${FLAGS} ${INCLUDE} -o src/$@
 $(LIB):$(OBJ)
-	ar rcs $@ $^
-st:$(MAIN)
+	ar rcs $@ $(patsubst %.o,src/%.o,$^)
+st:$(patsubst %.c,src/%.c,$(MAIN))
 	${CC}  $^ -o $@  ${FLAGS} ${INCLUDE} ${LCLUDE} -lmst -lgimpl
 $(INSTALL):st
 	cp $^ $@
 cleanobj:
 	rm -rf *.o
 clean:
-	rm -rf *.o *.a st
+	rm -rf src/*.o *.a st

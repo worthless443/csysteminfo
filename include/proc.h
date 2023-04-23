@@ -9,3 +9,4 @@ char *stdout_getcmd_constant(const char *cmd, int size);
 char *stdout_getcmd(const char *cmd) ;
 void print_process(char **procs,int nl_size,int) ;
 char *store_process_string(char **procs,int nl_size,int offset);
+char **get_processes_non_alloc(char **split_arr, char **proc,int nl_size);

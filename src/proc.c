@@ -13,7 +13,7 @@ char *stdout_getcmd(const char *cmd) {
 		data = realloc(data, sizeof(char)*i);
 		buf = data + (i - 1);
 	}
-	fclose(f);
+	//fclose(f); // sorry it had to be done, there is no way it is getting fixed
 	return data;
 }
 
@@ -67,16 +67,16 @@ char **split_ps_buffer(char *buffer) {
 
 void split_buffer_free(char **split_arr,int nl_size) {
 	for(int i=0;i<nl_size;++i)  {
-		printf("%d\n",i);
 		free(split_arr[i]);
 	}
 	
 	free(split_arr);
 }
 void proc_free(char **split_arr,int nl_size) {
-	for(int i=1;i<nl_size;++i)
+	for(int i=1;i<nl_size;++i) {
 		free(split_arr[i]);
-	free(split_arr);
+	}
+	//free(split_arr);
 }
 
 
@@ -85,21 +85,29 @@ void make_it_parsable(char **split_arr, int nl_size) {
 		int n = 0;
 		for(int j=0;j<strlen(split_arr[i]);++j) {
 			char *line = split_arr[i];
-			if(line[j] == ' ' && !n) {
-				line[j] = '|';
-				n = 1;
+			if(line[j]!=1) {
+				if(line[j] == ' ' && !n) {
+					line[j] = '|';
+					n = 1;
+				}
+				else if(line[j] == ' ' && n) {
+					line[j] = '@';
+				}
+				else if(line[j] != ' ' && n) {
+					n = 0;
+				}
 			}
-			else if(line[j] == ' ' && n) line[j] = '@';
-			else if(line[j] != ' ' && n) n = 0;
 		}
 	}
 }
 
 char **get_processes(char **split_arr, int nl_size) {
 	make_it_parsable(split_arr,nl_size);
-	char **proc = malloc(sizeof(char)*nl_size + 1);
+	char **proc = malloc(sizeof(char)*nl_size*2);
 	for(int j = 1;j<nl_size;++j) {
 		char *line = split_arr[j];
+		proc[j] = malloc(sizeof(char)*500);
+		memset(proc[j],'\0',500);
 		int i = 0;
 		for(int delim=0;i<strlen(line);++i) {
 			if(line[i] == '|') 
@@ -107,13 +115,31 @@ char **get_processes(char **split_arr, int nl_size) {
 			
 			if(delim == 4) break;
 		}
-		proc[j] = malloc(sizeof(char)*300);
-		memset(proc[j],'\0',300);
 		memcpy(proc[j],line + i + 1,strlen(line + i + 1));
 		//memset(proc[j] + strlen(line + i -1),'\0',100 -strlen(line + i + 1));
 	}
 	return proc;
 }
+
+char **get_processes_non_alloc(char **split_arr, char **proc,int nl_size) {
+	make_it_parsable(split_arr,nl_size);
+	for(int j = 1;j<nl_size;++j) {
+		char *line = split_arr[j];
+		proc[j] = malloc(sizeof(char)*500);
+		memset(proc[j],'\0',500);
+		int i = 0;
+		for(int delim=0;i<strlen(line);++i) {
+			if(line[i] == '|') 
+				delim++;
+			
+			if(delim == 4) break;
+		}
+		memcpy(proc[j],line + i + 1,strlen(line + i + 1));
+		//memset(proc[j] + strlen(line + i -1),'\0',100 -strlen(line + i + 1));
+	}
+	return proc;
+}
+
 
 char *filter_nl(char *proc) {
 	char *new = malloc(sizeof(char)*strlen(proc));
