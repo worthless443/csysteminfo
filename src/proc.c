@@ -69,23 +69,23 @@ void split_buffer_free(char **split_arr,int nl_size) {
 	for(int i=0;i<nl_size;++i)  {
 		free(split_arr[i]);
 	}
-	
 	free(split_arr);
 }
+
 void proc_free(char **split_arr,int nl_size) {
 	for(int i=1;i<nl_size;++i) {
+		//printf("%d\n",i);
 		free(split_arr[i]);
 	}
 	//free(split_arr);
 }
-
 
 void make_it_parsable(char **split_arr, int nl_size) {
 	for(int i=0;i<nl_size;++i) {
 		int n = 0;
 		for(int j=0;j<strlen(split_arr[i]);++j) {
 			char *line = split_arr[i];
-			if(line[j]!=1) {
+			if(line[j]>9) {
 				if(line[j] == ' ' && !n) {
 					line[j] = '|';
 					n = 1;
@@ -100,11 +100,30 @@ void make_it_parsable(char **split_arr, int nl_size) {
 		}
 	}
 }
+char **get_processes_pass(char **split_arr, char **proc, int nl_size) {
+	make_it_parsable(split_arr,nl_size);
+	for(int j = 0;j<nl_size;++j) {
+		char *line = split_arr[j];
+		proc[j] = malloc(sizeof(char)*500);
+		memset(proc[j],'\0',500);
+		int i = 0;
+		for(int delim=0;i<strlen(line);++i) {
+			if(line[i] == '|') 
+				delim++;
+			
+			if(delim == 4) break;
+		}
+		memcpy(proc[j],line + i + 1,strlen(line + i + 1));
+		//memset(proc[j] + strlen(line + i -1),'\0',100 -strlen(line + i + 1));
+	}
+	return proc;
+}
+
 
 char **get_processes(char **split_arr, int nl_size) {
 	make_it_parsable(split_arr,nl_size);
 	char **proc = malloc(sizeof(char)*nl_size*2);
-	for(int j = 1;j<nl_size;++j) {
+	for(int j = 0;j<nl_size;++j) {
 		char *line = split_arr[j];
 		proc[j] = malloc(sizeof(char)*500);
 		memset(proc[j],'\0',500);
@@ -142,6 +161,7 @@ char **get_processes_non_alloc(char **split_arr, char **proc,int nl_size) {
 
 
 char *filter_nl(char *proc) {
+	int x = strlen(proc);
 	char *new = malloc(sizeof(char)*strlen(proc));
 	memset(new,'\0',strlen(proc));
 	for(int i=0,j=-1;i<strlen(proc);++i)
@@ -176,18 +196,24 @@ char *store_process_string(char **procs,int nl_size,int offset) {
 	return procs_str;
 }
 
+void _memcpy(void **src, void **dst, int size) {
+	for(int i = 0;i<size;++i) {
+		dst[i] = malloc(sizeof(char)*1000);
+		memcpy(dst[i],src[i],1000);
+	}
+}
+
 #ifdef __MAIN__
 int main() {
-	char *cmd = stdout_getcmd_constant("ps -a",500);
+	char *cmd = stdout_getcmd("ps -a");
 	int nl_size = calc_newline(cmd);
 	char **lines = split_ps_buffer(cmd);
-	char **procs = get_processes(lines,nl_size);	
-	//print_process(procs,nl_size);
-	char *str = store_process_string(procs,nl_size,2);
+	char **procs = get_processes(lines,nl_size - 1);	
+	char *str = store_process_string(procs,nl_size - 1,2);
 	printf("%s\n",str);
+	split_buffer_free(lines,nl_size);
 	free(str);
-	//split_buffer_free(lines,nl_size);
-	proc_free(procs,nl_size);
+	proc_free(procs,nl_size - 1);
 	free(cmd);
 }
 #endif

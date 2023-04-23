@@ -51,13 +51,15 @@ int main(int argc, char **argv) {
 			}
 		}
 	}
+	char *str = only_process_wrapper_str(poff);
 	struct BatSt st;
 	bat_parse(&st);
 	int ramused = memused_wrapper();
 	if(showproc)
-		only_process_wrapper(poff);
+		printf("%s\n",str);
 	if(showbat)
 		printf("battery: %s%d\%\n", st.ret ? "+" : "-", st.pert);
 	if(showmem)
 		printf("ramused: %dMiB\n", ramused);
+	free(str);
 }
