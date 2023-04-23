@@ -41,7 +41,7 @@ int only_process_wrapper(int offset) {
 	proc_free(procs,nl_size);
 	free(procs);
 	return 1;
-}
+ }
 
 char *only_process_wrapper_str(int offset) {
 	char *cmd = stdout_getcmd_constant("ps -a",10000);
