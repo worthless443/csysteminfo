@@ -73,7 +73,7 @@ void split_buffer_free(char **split_arr,int nl_size) {
 }
 
 void proc_free(char **split_arr,int nl_size) {
-	for(int i=1;i<nl_size;++i) {
+	for(int i=0;i<nl_size;++i) {
 		//printf("%d\n",i);
 		free(split_arr[i]);
 	}
@@ -106,12 +106,15 @@ char **get_processes_pass(char **split_arr, char **proc, int nl_size) {
 		char *line = split_arr[j];
 		proc[j] = malloc(sizeof(char)*500);
 		memset(proc[j],'\0',500);
-		int i = 0;
+		int i = 0, brk_cnd;
+		
 		for(int delim=0;i<strlen(line);++i) {
 			if(line[i] == '|') 
 				delim++;
 			
-			if(delim == 4) break;
+			if(j > 7) brk_cnd  = 3;
+			else brk_cnd = 4;
+			if(delim == brk_cnd) break;
 		}
 		memcpy(proc[j],line + i + 1,strlen(line + i + 1));
 		//memset(proc[j] + strlen(line + i -1),'\0',100 -strlen(line + i + 1));
