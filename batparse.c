@@ -63,23 +63,36 @@ static int getNLwholeChar(const char *str, const char *mat) {
 	return i;
 }
 
-static int reachRelvBuf1(const char *str, char *buf) {
-	int times = 0, content=0;
+static int reachRelvBuf1(const char *str, char *buf, char *buffer_) {
+	int times = 0, content=0,ii=-1;
 	int chr = '\n';
-	char buffer_[100];
-	char pert[10];
-	char charge[10];
+	//char *buffer_ = malloc(sizeof(char)*1000);
+	char charge[50];
+	//char buf[strlen(tmpbuf) + 1];// = malloc(sizeof(char)*strlen(tmpbuf));
+	//memset(buf,'\0',strlen(tmpbuf));
+	//memcpy(buf,tmpbuf,strlen(tmpbuf));
 	memcpy(buf,str,getNLwholeChar(str, "ing"));
 #ifdef __DEBUG_PRINT_3
 	printf("debug2: %s\n", buf);
 #endif
-	for(int i=0;i<2;++i) strcat(buf, (char*)&chr);
+	
+	int old_size = strlen(buf);
+	for(int i=1;i<=2;++i) buf[old_size + i] = chr;
 	for(int i=0,ii=-1;i<strlen(buf);++i) {
 		if(*(buf+i)=='\n') times++;
 		if(times>=getNLnumber(buf,2)) buffer_[++ii] = buf[i];
 	}
-	for(int i=0,ii=-1;i<strlen(buffer_);++i) 
-		if(*(buffer_ + i)!=' ') pert[++ii] = buffer_[i];
+	for(int i=0;i<strlen(buffer_);++i)  
+		if(*(buffer_ + i)!=' ') ++ii;
+	char *pert = malloc(sizeof(char)*ii);
+	ii = -1;
+	for(int i=0;i<strlen(buffer_);++i) {
+		if(*(buffer_ + i)!=' ') {
+			pert[++ii] = buffer_[i];
+			//printf("%d\n",ii);
+		}
+	}
+
 	for(int nl=0;content<strlen(pert);++content) {
 		if(*(pert + content)=='\n') nl++;
 		if(nl==2) break;
@@ -93,6 +106,7 @@ static int reachRelvBuf1(const char *str, char *buf) {
 #ifdef __DEBUG_PRINT_1
 	printf("debug2: %s\n", charge);
 #endif
+	free(pert);
 	if(strcmp(charge + 1,"charg")==0) return 1; // matching against discharge buggy with buffers and addresses
 	else return 0;
 	return -1;
@@ -160,10 +174,18 @@ static int reachRelvNum(const char *str, char *buf) {
 int parse_str(const char *str, char *buf) {
 	char buffer_[100];
 	char buffer[100];
+	char buf_[1000];
+	int oldsize;
+	memset(buf_,'\0',1000);
 	memset(buffer,'\0', 100);
 	memcpy(buf,str,getNLwhole(str, *"\%")+2);
+	for(oldsize = 0;buf[oldsize] != '%';++oldsize);
 	for(int i=0;i<4;i++) strcat(buf, "\n");
-	reachRelvBuf(buf,buffer_);
+	memcpy(buf_,buf,++oldsize);
+	for(int i=oldsize,ii=oldsize-1;i<strlen(buf);++i)
+ 		if(buf[i]=='\n')
+ 			buf_[++ii] = buf[i];
+	reachRelvBuf(buf_,buffer_);
 	reachRelvNum(buffer_,buffer);
 	memset(buffer + 4, '\0', 100 - 4);
 #ifdef __DEBUG_PRINT_2
@@ -172,5 +194,8 @@ int parse_str(const char *str, char *buf) {
 	return _atoi(buffer);
 }
 int parse_charge(const char *str, char *buf) {
-	return reachRelvBuf1(str, buf);
+	char *buffer_ = malloc(sizeof(char)*1000);
+	int ret = reachRelvBuf1(str, buf,buffer_);
+	free(buffer_);
+	return ret;
 }
