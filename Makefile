@@ -5,7 +5,7 @@ LCLUDE=-L./ -L${GIMPL_PATH}
 CC=clang
 LIB=libmst.a
 MAIN=main
-FLAGS=-O3 -ggdb
+FLAGS=-O3 -ggdb -Wno-unused-command-line-argument -Wno-format-invalid-specifier
 
 all: $(LIB) $(MAIN) 
 $(OBJ):%.o:%.c

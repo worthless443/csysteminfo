@@ -17,7 +17,7 @@ static int memused(int *arr) {
 	int c=0;
 	char *out = malloc(sizeof(char) * 100);
 	while(fread(buf,1,1,f)) {
-	 	if((res=regcomp(&re, "[a-zA-Z\(\_\:]",REG_EXTENDED))==0) {
+	 	if((res=regcomp(&re, "[a-zA-Z\\(\\_\\:]",REG_EXTENDED))==0) {
 			int match = regexec(&re, buf,0,NULL,0);
 			if(match==REG_NOMATCH) {
 					if(buf[0]!=" "[0] && buf[0]!="\n"[0] ) {

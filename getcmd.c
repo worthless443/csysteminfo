@@ -16,7 +16,7 @@ int __calc_newline(char *cmd) {
 	return nl;
 }
 
-char *read_file(char *cmd, char *file) {
+char *read_file(const char *cmd, const char *file) {
 	int ret = system(cmd);
 	char *data = malloc(sizeof(char)*4095);
 	char *buffer = data;

@@ -8,5 +8,5 @@ struct BatSt {
 };
 int bat_parse(struct BatSt *);
 char *process_wrapper_st();
-char *read_file(char *cmd, char *file);
+char *read_file(const char *cmd, const char *file);
 char *only_process_wrapper_str1();
