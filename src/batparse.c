@@ -67,8 +67,8 @@ static int reachRelvBuf1(const char *str, char *buf) {
 	int times = 0, content=0;
 	int chr = '\n';
 	char buffer_[100];
-	char pert[10];
-	char charge[10];
+	char pert[50];
+	char charge[50];
 	memcpy(buf,str,getNLwholeChar(str, "ing"));
 #ifdef __DEBUG_PRINT_3
 	printf("debug2: %s\n", buf);
