@@ -16,6 +16,16 @@ int __calc_newline(char *cmd) {
 	return nl;
 }
 
+int __calc_newline_buffer(char *cmd) {
+	int nl = 0,i;
+	for(i = 0;i<strlen(cmd) - 1;++i)  {
+		if(cmd[i] == '\n') ++nl;
+		if(cmd[i] == 'p' && cmd[i + 1]=='s') break;
+	}
+		
+	return i + 2;
+}
+
 char *read_file(const char *cmd, const char *file) {
 	int ret = system(cmd);
 	char *data = malloc(sizeof(char)*4095);
@@ -24,8 +34,8 @@ char *read_file(const char *cmd, const char *file) {
 	for(int i=1;fread(buffer,1,1,f);++i) {
 		data = realloc(data,sizeof(char)*i);
 		buffer = data + (i - 1);
-
 	}
+
 	fclose(f);
 	return data;
 		
@@ -54,16 +64,22 @@ int bat_parse(struct BatSt *st) {
 	return 1;
 }
 char *only_process_wrapper_str1() {
-	char *cmd = read_file("ps -a > pscmd","pscmd");
-	int nl_size =__calc_newline(cmd);
-	char **lines = split_ps_buffer(cmd);
+	char *__cmd = read_file("ps -a > pscmd","pscmd");
+	int nl_size =__calc_newline(__cmd);
+	int size_buffer = __calc_newline_buffer(__cmd);
+	char *cmd = malloc(sizeof(char)*size_buffer);
+	memset(cmd + size_buffer - 1,'\0',2);
+	memcpy(cmd,__cmd,size_buffer);
+	free(__cmd);
+	char **lines = split_ps_buffer(cmd,nl_size);
 	char **procs = malloc(sizeof(char*)*nl_size);
-	get_processes_pass(lines,procs,nl_size - 1);	
-	//char *str = store_process_string(procs,nl_size - 1,7);
-	//printf("%d\n",nl_size);
+	get_processes_pass(lines,procs,nl_size);	
 	split_buffer_free(lines,nl_size);
 	char *str = procs[nl_size - 2];
-	proc_free(procs,nl_size - 1);
+	//memset(str,'\0',100);
+	//memcpy(str,procs[nl_size - 2],strlen(procs[nl_size - 2]));
+	proc_free(procs,nl_size - 3);
+	proc_free(procs + nl_size - 1,1);
 	free(cmd);
 	free(procs);
 	return str;
@@ -73,7 +89,7 @@ char *only_process_wrapper_str1() {
 char *only_process_wrapper_str2() {
 	char *cmd = read_file("ps -a > pscmd","pscmd");
 	int nl_size =__calc_newline(cmd);
-	char **lines = split_ps_buffer(cmd);
+	char **lines = split_ps_buffer(cmd,nl_size);
 	char **procs = malloc(sizeof(char*)*nl_size);
 	get_processes_pass(lines,procs,nl_size - 1);	
 	//char *str = store_process_string(procs,nl_size - 1,7);
@@ -92,7 +108,7 @@ int only_process_wrapper(int offset) {
 	char *cmd = stdout_getcmd("ps -a");
 	int nl_size = calc_newline(cmd);
 	char **procs = malloc(sizeof(char*)*nl_size + 1);
-	char **lines = split_ps_buffer(cmd);
+	char **lines = split_ps_buffer(cmd,nl_size);
 	get_processes_non_alloc(lines,procs,nl_size);	
 	print_process(procs,nl_size,offset);
 	split_buffer_free(lines,nl_size);
@@ -105,7 +121,7 @@ int only_process_wrapper(int offset) {
 char *only_process_wrapper_str(int offset) {
 	char *cmd = stdout_getcmd("ps -a");
 	int nl_size = calc_newline(cmd);
-	char **lines = split_ps_buffer(cmd);
+	char **lines = split_ps_buffer(cmd,nl_size);
 	char **procs = malloc(sizeof(char*)*nl_size);
 	get_processes_pass(lines,procs,nl_size - 1);	
 	char *str = store_process_string(procs,nl_size - 1,2);
@@ -118,7 +134,7 @@ char *only_process_wrapper_str(int offset) {
 char *process_wrapper_st() {
 	char *cmd = read_file("ps -a > pscmd","pscmd");
 	int nl_size = calc_newline(cmd);
-	char **lines = split_ps_buffer(cmd);
+	char **lines = split_ps_buffer(cmd,nl_size);
 	char **procs = malloc(sizeof(char*)*nl_size);
 	get_processes_pass(lines,procs,nl_size - 2);	
 	char *proc = procs[nl_size - 3];

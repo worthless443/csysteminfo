@@ -42,8 +42,7 @@ int calc_line_size(char *buffer,int line) {
 	return 0;	
 }
 
-char **split_ps_buffer(char *buffer) {
-	int nl_size = calc_newline(buffer); 
+char **split_ps_buffer(char *buffer, int nl_size) {
 	int sizes[nl_size];//= malloc(sizeof(int)*nl_size);
 	for(int i=0;i<nl_size;++i)
 		sizes[i] = calc_line_size(buffer,i);
@@ -67,6 +66,7 @@ char **split_ps_buffer(char *buffer) {
 
 void split_buffer_free(char **split_arr,int nl_size) {
 	for(int i=0;i<nl_size;++i)  {
+		//printf("free %d\n",i);
 		free(split_arr[i]);
 	}
 	free(split_arr);
