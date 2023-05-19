@@ -44,18 +44,22 @@ int calc_line_size(char *buffer,int line) {
 
 char **split_ps_buffer(char *buffer, int nl_size) {
 	int sizes[nl_size];//= malloc(sizeof(int)*nl_size);
+	int ii = -1;
 	for(int i=0;i<nl_size;++i)
 		sizes[i] = calc_line_size(buffer,i);
 	sort_int(sizes,nl_size - 1,1);
-	char **lines = malloc(sizeof(long long) * nl_size +1);
+	char **lines = malloc(sizeof(char*) * nl_size * 2);
 	for(int i=0,j=0,n=0;i<strlen(buffer);++i) {
 		if(!n) {
 			*(lines + j) = malloc(sizeof(char)* (*sizes * 20));
 			memset(*(lines + j), '\0', *sizes * 20);
 			n = 1;
+			ii = -1;
 		}
 		char tmp = buffer[i];
-		strcat(lines[j],&tmp);
+		lines[j][++ii] = tmp;
+		//strcat(lines[j],&tmp);
+		//memcpy(lines + j,&tmp,1);
 		if(buffer[i] == '\n') {
 			++j;
 			n = 0;
@@ -112,8 +116,7 @@ char **get_processes_pass(char **split_arr, char **proc, int nl_size) {
 			if(line[i] == '|') 
 				delim++;
 			
-			if(j > 7) brk_cnd  = 3;
-			else brk_cnd = 4;
+			brk_cnd = 4;
 			if(delim == brk_cnd) break;
 		}
 		memcpy(proc[j],line + i + 1,strlen(line + i + 1));

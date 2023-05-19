@@ -67,7 +67,7 @@ static int reachRelvBuf1(const char *str, char *buf, char *buffer_) {
 	int times = 0, content=0,ii=-1;
 	int chr = '\n';
 	//char *buffer_ = malloc(sizeof(char)*1000);
-	char charge[50];
+	char charge[96];// = malloc(sizeof(char*)*400);
 	//char buf[strlen(tmpbuf) + 1];// = malloc(sizeof(char)*strlen(tmpbuf));
 	//memset(buf,'\0',strlen(tmpbuf));
 	//memcpy(buf,tmpbuf,strlen(tmpbuf));
@@ -100,15 +100,22 @@ static int reachRelvBuf1(const char *str, char *buf, char *buffer_) {
 	memset(pert + content, '\0', strlen(pert) - content);
 	for(int i=0;i<strlen(pert + 1);++i) 
 		if(*(pert + i + 1)==':') {
-				memcpy(charge, pert + i + 1, strlen(pert + 1) - i)	;
+			memcpy(charge, pert + i + 1, strlen(pert + 1) - i)	;
 		}
 	memset(charge + strlen("charg") + 1, '\0', strlen(charge) - strlen("charg") + 1);
 #ifdef __DEBUG_PRINT_1
 	printf("debug2: %s\n", charge);
 #endif
 	free(pert);
-	if(strcmp(charge + 1,"charg")==0) return 1; // matching against discharge buggy with buffers and addresses
-	else return 0;
+	if(strcmp(charge + 1,"charg")==0) {
+		//free(charge);
+		return 1; // matching against discharge buggy with buffers and addresses
+	}
+	else {
+		//free(charge);
+		return 0;
+	}
+	//free(charge);
 	return -1;
 }
 
@@ -172,8 +179,8 @@ static int reachRelvNum(const char *str, char *buf) {
 }
 
 int parse_str(const char *str, char *buf) {
-	char buffer_[100];
-	char buffer[100];
+	char buffer_[1000];
+	char buffer[1000];
 	char buf_[1000];
 	int oldsize;
 	memset(buf_,'\0',1000);

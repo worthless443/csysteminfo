@@ -6,9 +6,9 @@
 #include<batparse.h>
 #include<proc.h>
 
-int __calc_newline(char *cmd) {
+int __calc_newline(char *cmd, int size) {
 	int nl = 0;
-	for(int i = 0;i<strlen(cmd) - 1;++i)  {
+	for(int i = 0;i<size - 1;++i)  {
 		if(cmd[i] == '\n') ++nl;
 		if(cmd[i] == 'p' && cmd[i + 1]=='s') break;
 	}
@@ -28,14 +28,16 @@ int __calc_newline_buffer(char *cmd) {
 
 char *read_file(const char *cmd, const char *file) {
 	int ret = system(cmd);
+	int i;
 	char *data = malloc(sizeof(char)*4095);
 	char *buffer = data;
 	FILE *f = fopen(file,"r");
-	for(int i=1;fread(buffer,1,1,f);++i) {
-		data = realloc(data,sizeof(char)*i);
+	for(i=1;fread(buffer,1,1,f);++i) {
+		data = realloc(data,i);
 		buffer = data + (i - 1);
 	}
-
+	data = realloc(data,i + 1);
+	memset(data + i,'\0',1);
 	fclose(f);
 	return data;
 		
@@ -65,9 +67,10 @@ int bat_parse(struct BatSt *st) {
 }
 char *only_process_wrapper_str1() {
 	char *__cmd = read_file("ps -a > pscmd","pscmd");
-	int nl_size =__calc_newline(__cmd);
+	size_t sz = strlen(__cmd);
+	int nl_size =__calc_newline(__cmd,sz);
 	int size_buffer = __calc_newline_buffer(__cmd);
-	char *cmd = malloc(sizeof(char)*size_buffer);
+	char *cmd = malloc(sizeof(char*)*size_buffer);
 	memset(cmd + size_buffer - 1,'\0',2);
 	memcpy(cmd,__cmd,size_buffer);
 	free(__cmd);
@@ -88,7 +91,8 @@ char *only_process_wrapper_str1() {
 
 char *only_process_wrapper_str2() {
 	char *cmd = read_file("ps -a > pscmd","pscmd");
-	int nl_size =__calc_newline(cmd);
+	size_t sz = strlen(cmd);
+	int nl_size =__calc_newline(cmd,sz);
 	char **lines = split_ps_buffer(cmd,nl_size);
 	char **procs = malloc(sizeof(char*)*nl_size);
 	get_processes_pass(lines,procs,nl_size - 1);	
