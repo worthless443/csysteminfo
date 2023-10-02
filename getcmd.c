@@ -77,11 +77,11 @@ char *only_process_wrapper_str1() {
 	char **lines = split_ps_buffer(cmd,nl_size);
 	char **procs = malloc(sizeof(char*)*nl_size);
 	get_processes_pass(lines,procs,nl_size);	
-	split_buffer_free(lines,nl_size);
+	split_buffer_free(lines,nl_size +  1);
 	char *str = procs[nl_size - 2];
 	//memset(str,'\0',100);
 	//memcpy(str,procs[nl_size - 2],strlen(procs[nl_size - 2]));
-	proc_free(procs,nl_size - 3);
+	proc_free(procs,nl_size - 2);//- 3);
 	proc_free(procs + nl_size - 1,1);
 	free(cmd);
 	free(procs);
@@ -95,7 +95,7 @@ char *only_process_wrapper_str2() {
 	int nl_size =__calc_newline(cmd,sz);
 	char **lines = split_ps_buffer(cmd,nl_size);
 	char **procs = malloc(sizeof(char*)*nl_size);
-	get_processes_pass(lines,procs,nl_size - 1);	
+	get_processes_pass(lines,procs,nl_size);	
 	//char *str = store_process_string(procs,nl_size - 1,7);
 	//printf("%d\n",nl_size);
 	split_buffer_free(lines,nl_size);

@@ -67,7 +67,7 @@ static int reachRelvBuf1(const char *str, char *buf, char *buffer_) {
 	int times = 0, content=0,ii=-1;
 	int chr = '\n';
 	//char *buffer_ = malloc(sizeof(char)*1000);
-	char charge[96];// = malloc(sizeof(char*)*400);
+	char *charge = malloc(sizeof(char*)*400);
 	//char buf[strlen(tmpbuf) + 1];// = malloc(sizeof(char)*strlen(tmpbuf));
 	//memset(buf,'\0',strlen(tmpbuf));
 	//memcpy(buf,tmpbuf,strlen(tmpbuf));
@@ -81,14 +81,20 @@ static int reachRelvBuf1(const char *str, char *buf, char *buffer_) {
 	for(int i=0,ii=-1;i<strlen(buf);++i) {
 		if(*(buf+i)=='\n') times++;
 		if(times>=getNLnumber(buf,2)) buffer_[++ii] = buf[i];
+		if(i == strlen(buf) - 1)
+			buffer_[ii + 1] = 0;
 	}
-	for(int i=0;i<strlen(buffer_);++i)  
+
+	for(int i=0;i<strlen(buffer_);++i)  {
 		if(*(buffer_ + i)!=' ') ++ii;
-	char *pert = malloc(sizeof(char)*ii);
+	}
+	char *pert = malloc(sizeof(char)*(ii*2));
 	ii = -1;
 	for(int i=0;i<strlen(buffer_);++i) {
 		if(*(buffer_ + i)!=' ') {
 			pert[++ii] = buffer_[i];
+			if(i == strlen(buffer_) - 1)
+				memcpy(pert + ii + 1, "\0\0",2);
 			//printf("%d\n",ii);
 		}
 	}
@@ -98,24 +104,27 @@ static int reachRelvBuf1(const char *str, char *buf, char *buffer_) {
 		if(nl==2) break;
 	}
 	memset(pert + content, '\0', strlen(pert) - content);
-	for(int i=0;i<strlen(pert + 1);++i) 
+	for(int i=0;i<=strlen(pert + 1);++i) {
 		if(*(pert + i + 1)==':') {
 			memcpy(charge, pert + i + 1, strlen(pert + 1) - i)	;
+			charge[(strlen(pert + 1) - i) + 1] = '\0';
+			// wasteful: 
 		}
+		//printf("len %s\n", *charge);
+	}
 	memset(charge + strlen("charg") + 1, '\0', strlen(charge) - strlen("charg") + 1);
-#ifdef __DEBUG_PRINT_1
+//#ifdef __DEBUG_PRINT_1
 	printf("debug2: %s\n", charge);
-#endif
+//#endif
 	free(pert);
 	if(strcmp(charge + 1,"charg")==0) {
-		//free(charge);
+		free(charge);
 		return 1; // matching against discharge buggy with buffers and addresses
 	}
 	else {
-		//free(charge);
+		free(charge);
 		return 0;
 	}
-	//free(charge);
 	return -1;
 }
 
@@ -202,6 +211,7 @@ int parse_str(const char *str, char *buf) {
 }
 int parse_charge(const char *str, char *buf) {
 	char *buffer_ = malloc(sizeof(char)*1000);
+	*buffer_ = 0;
 	int ret = reachRelvBuf1(str, buf,buffer_);
 	free(buffer_);
 	return ret;

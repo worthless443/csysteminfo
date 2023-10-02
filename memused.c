@@ -18,10 +18,12 @@ static int memused(int *arr) {
 	char *out = malloc(sizeof(char) * 100);
 	while(fread(buf,1,1,f)) {
 	 	if((res=regcomp(&re, "[a-zA-Z\\(\\_\\:]",REG_EXTENDED))==0) {
-			int match = regexec(&re, buf,0,NULL,0);
+			char op[2];
+			*op = *buf;
+			int match = regexec(&re, op,0,NULL,0);
 			if(match==REG_NOMATCH) {
-					if(buf[0]!=" "[0] && buf[0]!="\n"[0] ) {
-						arr[++c-1] = atoi(buf);
+					if(op[0]!=" "[0] && op[0]!="\n"[0] ) {
+						arr[++c-1] = atoi(op);
 					}
 				}
 			}
@@ -48,6 +50,7 @@ const char *buffer = "fuck\nyou\nfucking\n\nnigger\ncoomer\n\nsoyjack\n";
 
 static char *filter_nonint(const char *str) {
 	char *out = malloc(sizeof(char)*100);
+	// change(2)
 	for(int i = 0,j=-1;i<strlen(str);++i)
 		if(*(str + i)>='0' && *(str + i) <='9')
 			out[++j] = str[i];
@@ -65,8 +68,10 @@ static int test_strutils(const char *buffer, struct Ranges range) {
 }
 int memused_wrapper() {
 	int *arr = malloc(sizeof(int)*1000);
-	char *out = malloc(sizeof(char)*1000),*snum = NULL;
+	char *out = malloc(sizeof(char)*1024),*snum = NULL;
+	*out = '\0';
 	memused(arr);
+	// change (1)
 	for(int i=8;i<15;i++) {
 		// use two
 		char buf[2];
