@@ -58,7 +58,7 @@ static char *filter_nonint(const char *str) {
 }
 
 static int test_strutils(const char *buffer, struct Ranges range) {
-	char *m_buffer = malloc(sizeof(char)*1000);
+	char *m_buffer = malloc(sizeof(char)*100);
 	memcpy(m_buffer, buffer, strlen(buffer));
 	erase_blankNL(m_buffer);
 	erase_portions(m_buffer, range);
@@ -67,8 +67,8 @@ static int test_strutils(const char *buffer, struct Ranges range) {
 	return 1;
 }
 int memused_wrapper() {
-	int *arr = malloc(sizeof(int)*1000);
-	char *out = malloc(sizeof(char)*1024),*snum = NULL;
+	int *arr = malloc(sizeof(int)*400);
+	char *out = malloc(sizeof(char)*124),*snum = NULL;
 	*out = '\0';
 	memused(arr);
 	// change (1)

@@ -2,6 +2,7 @@
 #include<unistd.h>
 #include<stdio.h>
 #include<string.h>
+#include<assert.h>
 #include<fcntl.h>
 
 #include<xtoi.h>
@@ -141,6 +142,7 @@ static int insertNL(char *buffer) {
 		*(buffer + strlen(buffer)) = '\n';
 	return 1;
 }
+
 static int reachRelvBuf(const char *str, char *buf) {
 	int size=0,times=0,nl_i;
 	char buffer[100];
@@ -187,20 +189,37 @@ static int reachRelvNum(const char *str, char *buf) {
 	return 1; // TODO enable error checking associated with ret int
 }
 
+int old_strpd_char_len = 0;
 int parse_str(const char *str, char *buf) {
-	char buffer_[1000];
-	char buffer[1000];
-	char buf_[1000];
+	char buffer_[1000] = {0};
+	char buffer[1000] = {0};
+	char buf_[1000] = {0};
 	int oldsize;
-	memset(buf_,'\0',1000);
-	memset(buffer,'\0', 100);
-	memcpy(buf,str,getNLwhole(str, *"\%")+2);
+	int nl_whole = getNLwhole(str, '%');
+
+	//memset(buf_,'\0',1000);
+	//memset(buffer,'\0', 100);
+	
+	// BUG buffer keep getting larger : fixed
+
+	memcpy(buf,str,nl_whole+2);
 	for(oldsize = 0;buf[oldsize] != '%';++oldsize);
-	for(int i=0;i<4;i++) strcat(buf, "\n");
+	
+	memcpy(buf + nl_whole + 2, "\n\n\n\n",4);
+
+	if(!old_strpd_char_len)
+		old_strpd_char_len = strlen(buf);
+
+	int change_offset = strlen(buf) - old_strpd_char_len ;
+	
+	assert(change_offset >= -10 && change_offset <= 10);
+	old_strpd_char_len = strlen(buf);
+
 	memcpy(buf_,buf,++oldsize);
 	for(int i=oldsize,ii=oldsize-1;i<strlen(buf);++i)
  		if(buf[i]=='\n')
  			buf_[++ii] = buf[i];
+
 	reachRelvBuf(buf_,buffer_);
 	reachRelvNum(buffer_,buffer);
 	memset(buffer + 4, '\0', 100 - 4);
@@ -210,7 +229,7 @@ int parse_str(const char *str, char *buf) {
 	return _atoi(buffer);
 }
 int parse_charge(const char *str, char *buf) {
-	char *buffer_ = malloc(sizeof(char)*1000);
+	char *buffer_ = malloc(sizeof(char)*200);
 	*buffer_ = 0;
 	int ret = reachRelvBuf1(str, buf,buffer_);
 	free(buffer_);

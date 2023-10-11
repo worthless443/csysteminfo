@@ -84,7 +84,7 @@ void proc_free(char **split_arr,int nl_size) {
 	//free(split_arr);
 }
 
-void make_it_parsable(char **split_arr, int nl_size) {
+static void make_it_parsable(char **split_arr, int nl_size) {
 	for(int i=0;i<nl_size;++i) {
 		int n = 0;
 		for(int j=0;j<strlen(split_arr[i]);++j) {
@@ -104,22 +104,33 @@ void make_it_parsable(char **split_arr, int nl_size) {
 		}
 	}
 }
+
 char **get_processes_pass(char **split_arr, char **proc, int nl_size) {
+	// sus thing, might break or do bugs
 	make_it_parsable(split_arr,nl_size);
 	for(int j = 0;j<nl_size;++j) {
 		char *line = split_arr[j];
+		char line_sz = strlen(split_arr[j]);
 		proc[j] = malloc(sizeof(char)*500);
 		memset(proc[j],'\0',500);
-		int i = 0, brk_cnd;
+		int i = 0, brk_cnd = 0;
 		
-		for(int delim=0;i<strlen(line);++i) {
+		for(int delim=0;i<line_sz;++i) {
+			int lookahead = 0;
 			if(line[i] == '|') 
 				delim++;
-			
-			brk_cnd = 4;
-			if(delim == brk_cnd) break;
+			// look ahead if there still exists `|` 
+			for(int br=i;br<line_sz;++br) {
+				if(line[br] == '|') 
+					lookahead = 1;
+				if(!lookahead && br == line_sz - 1) 
+					brk_cnd = 1;		
+				
+			}
+			if(brk_cnd) break;
+			//if(delim == 5) break;
 		}
-		memcpy(proc[j],line + i + 1,strlen(line + i + 1));
+		memcpy(proc[j],line + i,strlen(line + i));
 		//memset(proc[j] + strlen(line + i -1),'\0',100 -strlen(line + i + 1));
 	}
 	return proc;

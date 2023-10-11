@@ -56,6 +56,8 @@ static int getStdOutInput(const char *command, char *buffer) {
 }
 
 int bat_parse(struct BatSt *st) {
+	if((unsigned long)st & 3)
+		printf("warning: 0x%x not aligned\n", (unsigned long)st);
 	const char *command = "upower -i /org/freedesktop/UPower/devices/battery_BAT0 > btfile";
     char *buffer = read_file(command,"btfile");
 	char buf[5000];
@@ -78,11 +80,15 @@ char *only_process_wrapper_str1() {
 	char **procs = malloc(sizeof(char*)*nl_size);
 	get_processes_pass(lines,procs,nl_size);	
 	split_buffer_free(lines,nl_size +  1);
-	char *str = procs[nl_size - 2];
+
+	int str_size = strlen(procs[nl_size - 2]);
+	char *str = malloc((sizeof(char) * str_size) + 1);
+	memcpy(str,procs[nl_size - 2], str_size);
+	str[str_size] = '\0';
 	//memset(str,'\0',100);
 	//memcpy(str,procs[nl_size - 2],strlen(procs[nl_size - 2]));
-	proc_free(procs,nl_size - 2);//- 3);
-	proc_free(procs + nl_size - 1,1);
+	proc_free(procs,nl_size);//- 3);
+	//proc_free(procs + nl_size - 1,1);
 	free(cmd);
 	free(procs);
 	return str;
